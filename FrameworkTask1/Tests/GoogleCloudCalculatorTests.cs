@@ -1,9 +1,8 @@
 using FrameworkTask1.Driver;
 using FrameworkTask1.Model;
 using FrameworkTask1.PageObgects;
-using FrameworkTask1.Service;
+using FrameworkTask1.Utils;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Configuration.Json;
 using OpenQA.Selenium;
 
 namespace FrameworkTask1.Tests;
@@ -11,39 +10,44 @@ namespace FrameworkTask1.Tests;
 public sealed class GoogleCloudCalculatorTests : IDisposable
 {
     private readonly IWebDriver webDriver;
+    private readonly InstancesServiceConfiguration generalPurposeConfiguration;
+    private readonly ScreenshotHelper screenshotHelper;
+    private bool testFailed = true;
+    private readonly IConfigurationRoot configuration;
 
     public GoogleCloudCalculatorTests()
     {
-        var settings = new ConfigurationBuilder().AddJsonFile("appsettings.json", false, true).Build();
+        // dotnet test -e TEST_ENVIRONMENT=chrome
+        var env = Environment.GetEnvironmentVariable("TEST_ENVIRONMENT");
+        configuration = new ConfigurationBuilder()
+            .AddJsonFile("appsettings.json", optional: false)
+            .AddJsonFile($"appsettings.{env}.json", optional: true)
+            .Build();
 
-        webDriver = DriverSingleton.GetDriver();
+        webDriver = DriverSingleton.GetDriver(configuration["browser"]!);
+        webDriver.Url = configuration["baseURL"];
 
-        webDriver.Url = settings["baseURL"];
+        generalPurposeConfiguration = TestDataHelper.Get(configuration["testData"] ?? "GeneralPurpose.json");
+
+        screenshotHelper = new ScreenshotHelper(webDriver);
     }
 
     public void Dispose()
     {
+        if (testFailed)
+        {
+            string filePath = configuration["screenshotsPath"];
+            string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+            Directory.CreateDirectory(filePath);
+            screenshotHelper.TakeScreenshot(Path.Combine(filePath, $"failure_{timestamp}.png"));
+        }
+
         DriverSingleton.CloseDriver();
     }
-
 
     private void ConfigureProducts()
     {
         var pricingCalculatorPage = new PricingCalculatorPage(webDriver);
-        //pricingCalculatorPage.Navigate();
-
-        // predefined values
-        //const string NumberOfInstances = "4";
-        //const string Software = "Free: Debian, CentOS, CoreOS, Ubuntu or BYOL (Bring Your Own License)";
-        //const string MachineFamily = "General Purpose";
-        //const string Series = "N1";
-        //const string MashineType = "n1-standard-8";
-        //const string GpuType = "NVIDIA V100";
-        //const string GpusNumber = "1";
-        //const string LocalSSD = "2x375 GB";
-        //const string Region = "Netherlands (europe-west4)";
-
-        InstancesServiceConfiguration generalPurposeConfigurations = InstancesServiceConfigurationsCreator.CreateGeneralPurposeConfigurations();
 
         pricingCalculatorPage.ClickAdd();
         pricingCalculatorPage.WaitForAddToEstimateFrame();
@@ -52,22 +56,23 @@ public sealed class GoogleCloudCalculatorTests : IDisposable
         var computeEnginePage = new ComputeEnginePage(webDriver);
         computeEnginePage.WaitForPageLoaded();
 
-        computeEnginePage.EnterNumberOfInstances(generalPurposeConfigurations.NumberOfInstances);
-        computeEnginePage.SetSoftware(generalPurposeConfigurations.Software);
+        computeEnginePage.EnterNumberOfInstances(generalPurposeConfiguration.NumberOfInstances);
+        computeEnginePage.SetSoftware(generalPurposeConfiguration.Software);
 
         computeEnginePage.SetProvisioningModel();
-        computeEnginePage.SetMachineFamily(generalPurposeConfigurations.MachineFamily);
-        computeEnginePage.SetSeries(generalPurposeConfigurations.Series);
-        computeEnginePage.SetMachineType(generalPurposeConfigurations.MashineType);
+        computeEnginePage.SetMachineFamily(generalPurposeConfiguration.MachineFamily);
+        computeEnginePage.SetSeries(generalPurposeConfiguration.Series);
+        computeEnginePage.SetMachineType(generalPurposeConfiguration.MashineType);
 
         computeEnginePage.AddGPU();
-        computeEnginePage.WaitForGpuConfigsDisplayed();
-        computeEnginePage.SetGpuModel(generalPurposeConfigurations.GpuType);
-        computeEnginePage.SetGpuNumber(generalPurposeConfigurations.GpusNumber);
+        computeEnginePage.WaitUntilCostUpdated();
 
-        computeEnginePage.SetLocalSSD(generalPurposeConfigurations.LocalSSD);
+        computeEnginePage.SetGpuModel(generalPurposeConfiguration.GpuType);
+        computeEnginePage.SetGpuNumber(generalPurposeConfiguration.GpusNumber);
 
-        computeEnginePage.SetRegion(generalPurposeConfigurations.Region);
+        computeEnginePage.SetLocalSSD(generalPurposeConfiguration.LocalSSD);
+
+        computeEnginePage.SetRegion(generalPurposeConfiguration.Region);
         computeEnginePage.WaitUntilCostUpdated();
 
 
@@ -84,8 +89,6 @@ public sealed class GoogleCloudCalculatorTests : IDisposable
         webDriver.SwitchTo().Window(webDriver.WindowHandles[1]);
         var summaryPage = new CostEstimateSummaryPage(webDriver);
         summaryPage.WaitForPageLoaded();
-        
-        //webDriver.Navigate().Refresh();
 
         Assert.Equal("4", summaryPage.GetItemValue("Number of Instances"));
         Assert.Equal("Free: Debian, CentOS, CoreOS, Ubuntu or BYOL (Bring Your Own License)", summaryPage.GetItemValue("Operating System / Software"));
@@ -95,5 +98,6 @@ public sealed class GoogleCloudCalculatorTests : IDisposable
         Assert.Equal("1", summaryPage.GetItemValue("Number of GPUs"));
         Assert.Equal("2x375 GB", summaryPage.GetItemValue("Local SSD"));
         Assert.Equal("Netherlands (europe-west4)", summaryPage.GetItemValue("Region"));
+        testFailed = false;
     }
 }

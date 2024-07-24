@@ -12,11 +12,11 @@ public class DriverSingleton
 
     private DriverSingleton() { }
 
-    public static IWebDriver GetDriver()
+    public static IWebDriver GetDriver(string browser)
     {
         if (driver == null)
         {
-            switch (Environment.GetEnvironmentVariable("browser")?.ToLower())
+            switch (browser)
             {
                 case "firefox":
                     {
@@ -40,6 +40,6 @@ public class DriverSingleton
 
     public static void CloseDriver()
     {
-        //driver?.Quit();
+        driver?.Quit();
     }
 }

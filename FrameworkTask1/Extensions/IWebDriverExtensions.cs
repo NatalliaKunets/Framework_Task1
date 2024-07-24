@@ -10,17 +10,12 @@ public static class IWebDriverExtensions
         var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(5));
 
         dropdown.Click();
+        wait.Until(_ => { return dropdown.GetAttribute("aria-expanded") == "true"; });
 
-        dropdown.FindElement(By.XPath("//ul[@role='listbox']"));
+        IWebElement option = driver.FindElement(By.XPath($"//span[text() = '{value}']/ancestor::li[@role = 'option']"));
 
-
-        wait.Until(_ => value != null);
-
-        IWebElement softwareOption = driver.FindElement(By.XPath($"//span[text() = '{value}']/ancestor::li[@role = 'option']"));
-        driver.JsClick(softwareOption);
-
-        wait.Until(_ => dropdown.Enabled);
-
+        driver.JsClick(option);
+        wait.Until(_ => { return dropdown.GetAttribute("aria-expanded") == "false"; });
     }
 
     public static void JsClick(this IWebDriver driver, IWebElement element)

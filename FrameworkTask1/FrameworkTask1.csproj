@@ -10,19 +10,23 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="appsettings.debug.json" />
+    <None Remove="appsettings.chrome.json" />
+    <None Remove="appsettings.firefox.json" />
     <None Remove="appsettings.json" />
-    <None Remove="TestData\Data.json" />
+    <None Remove="TestData\GeneralPurpose.json" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="appsettings.debug.json">
+    <Content Include="appsettings.firefox.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="appsettings.chrome.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="TestData\Data.json">
+    <Content Include="TestData\GeneralPurpose.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
@@ -32,6 +36,7 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />
     <PackageReference Include="Selenium.Support" Version="4.23.0" />
     <PackageReference Include="Selenium.WebDriver" Version="4.23.0" />
+    <PackageReference Include="System.Text.Json" Version="8.0.4" />
     <PackageReference Include="WebDriverManager" Version="2.17.4" />
     <PackageReference Include="xunit" Version="2.9.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2">

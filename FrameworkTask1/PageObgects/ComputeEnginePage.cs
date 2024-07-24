@@ -1,6 +1,6 @@
-﻿using OpenQA.Selenium;
+﻿using FrameworkTask1.Extensions;
+using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
-using FrameworkTask1.Extensions;
 
 namespace FrameworkTask1.PageObgects;
 
@@ -9,7 +9,7 @@ internal class ComputeEnginePage
     private readonly IWebDriver driver;
     private readonly WebDriverWait wait;
 
-    const string DropdownXpath = "//div[text()='{0}']/ancestor::div[@role = 'combobox']";
+    const string DropdownXpath = "//*[text()='{0}']/ancestor::div[@role = 'combobox']";
 
     public ComputeEnginePage(IWebDriver webDriver)
     {
@@ -48,7 +48,7 @@ internal class ComputeEnginePage
     public void SetMachineFamily(string machineFamily) => driver.SetDropDownValue(MachineFamilyDropDown, machineFamily);
 
     public void SetSeries(string series) => driver.SetDropDownValue(SeriesDropDown, series);
-    
+
     public void SetMachineType(string machineType) => driver.SetDropDownValue(MachineTypeDropDown, machineType);
 
     public void AddGPU() => driver.JsClick(AddGPUsButton);
@@ -71,31 +71,15 @@ internal class ComputeEnginePage
     {
         var cost = TotalCost.Text;
 
-        //    WebDriverWait waitForCost = new(driver, TimeSpan.FromSeconds(5))
-        //    {
-        //        PollingInterval = TimeSpan.FromSeconds(1),
-        //    };
-        //    waitForCost.IgnoreExceptionTypes(typeof(WebDriverTimeoutException));
-
-        //    waitForCost.Until(_ => !string.Equals(TotalCost.Text, cost, StringComparison.InvariantCulture));
-   
-        int maxIterations = 20;
-
         try
         {
-            while (maxIterations-- > 0)
-            {
-                wait.Until(_ => !string.Equals(TotalCost.Text, cost, StringComparison.InvariantCulture));
-                cost = TotalCost.Text;
-            }
+            wait.Until(_ => !string.Equals(TotalCost.Text, cost, StringComparison.InvariantCulture));
         }
         catch (WebDriverTimeoutException) { }
     }
 
     public void WaitForPageLoaded() => wait.Until(_ => ComputeEngineHeader.Displayed);
 
-    public void WaitForGpuConfigsDisplayed() => wait.Until(_ => GPUModelDropDown.Displayed);
-    
     public void WaitForShareFrame() => wait.Until(_ => ShareEstimateHeader.Displayed);
 
 }

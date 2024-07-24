@@ -3,9 +3,9 @@ using FrameworkTask1.Utils;
 
 namespace FrameworkTask1.Service;
 
-public static class InstancesServiceConfigurationsCreator
+public static class InstancesServiceConfigurationCreator
 {
-    public static InstancesServiceConfiguration CreateGeneralPurposeConfigurations()
+    public static InstancesServiceConfiguration CreateGeneralPurposeConfiguration()
     {
         return TestDataHelper.Get("Data.json");
     }
