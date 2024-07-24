@@ -1,0 +1,12 @@
+﻿{
+
+  "NumberOfInstances": "4",
+  "Software": "Free: Debian, CentOS, CoreOS, Ubuntu or BYOL (Bring Your Own License)",
+  "MachineFamily": "General Purpose",
+  "Series": "N1",
+  "MashineType": "n1-standard-8",
+  "GpuType": "NVIDIA V100",
+  "GpusNumber": "1",
+  "LocalSSD": "2x375 GB",
+  "Region": "Netherlands (europe-west4)"
+}
