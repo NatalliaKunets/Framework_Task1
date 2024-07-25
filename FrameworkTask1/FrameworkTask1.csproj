@@ -13,7 +13,8 @@
     <None Remove="appsettings.chrome.json" />
     <None Remove="appsettings.firefox.json" />
     <None Remove="appsettings.json" />
-    <None Remove="TestData\GeneralPurpose.json" />
+    <None Remove="TestData\GeneralPurposeFree.json" />
+    <None Remove="TestData\GeneralPurposePaid.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -26,7 +27,10 @@
     <Content Include="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="TestData\GeneralPurpose.json">
+    <Content Include="TestData\GeneralPurposeFree.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestData\GeneralPurposePaid.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

@@ -2,7 +2,7 @@
 
 namespace FrameworkTask1.Utils;
 
-internal class ScreenshotHelper
+public class ScreenshotHelper
 {
     private readonly IWebDriver driver;
 
