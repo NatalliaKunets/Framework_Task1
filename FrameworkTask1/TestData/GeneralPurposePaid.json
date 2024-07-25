@@ -1,0 +1,11 @@
+{
+  "NumberOfInstances": "2",
+  "Software": "Paid: Ubuntu Pro",
+  "MachineFamily": "General Purpose",
+  "Series": "N1",
+  "MashineType": "n1-standard-32",
+  "GpuType": "NVIDIA T4",
+  "GpusNumber": "2",
+  "LocalSSD": "1x375 GB",
+  "Region": "London (europe-west2)"
+}
