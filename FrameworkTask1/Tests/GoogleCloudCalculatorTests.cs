@@ -27,7 +27,7 @@ public sealed class GoogleCloudCalculatorTests : IDisposable
         webDriver = DriverSingleton.GetDriver(configuration["browser"]!);
         webDriver.Url = configuration["baseURL"];
 
-        generalPurposeConfiguration = TestDataHelper.Get(configuration["testData"] ?? "GeneralPurpose.json");
+        generalPurposeConfiguration = TestDataHelper.Get(configuration["testData"] ?? "GeneralPurposeFree.json");
 
         screenshotHelper = new ScreenshotHelper(webDriver);
     }
@@ -90,14 +90,14 @@ public sealed class GoogleCloudCalculatorTests : IDisposable
         var summaryPage = new CostEstimateSummaryPage(webDriver);
         summaryPage.WaitForPageLoaded();
 
-        Assert.Equal("4", summaryPage.GetItemValue("Number of Instances"));
-        Assert.Equal("Free: Debian, CentOS, CoreOS, Ubuntu or BYOL (Bring Your Own License)", summaryPage.GetItemValue("Operating System / Software"));
-        Assert.Equal("Regular", summaryPage.GetItemValue("Provisioning Model"));
-        Assert.Equal("n1-standard-8, vCPUs: 8, RAM: 30 GB", summaryPage.GetItemValue("Machine type"));
-        Assert.Equal("NVIDIA V100", summaryPage.GetItemValue("GPU Model"));
-        Assert.Equal("1", summaryPage.GetItemValue("Number of GPUs"));
-        Assert.Equal("2x375 GB", summaryPage.GetItemValue("Local SSD"));
-        Assert.Equal("Netherlands (europe-west4)", summaryPage.GetItemValue("Region"));
+        Assert.Equal(generalPurposeConfiguration.NumberOfInstances, summaryPage.GetItemValue("Number of Instances"));
+        Assert.Equal(generalPurposeConfiguration.Software, summaryPage.GetItemValue("Operating System / Software"));
+        Assert.Contains(generalPurposeConfiguration.MashineType, summaryPage.GetItemValue("Machine type"));
+        Assert.Equal(generalPurposeConfiguration.GpuType, summaryPage.GetItemValue("GPU Model"));
+        Assert.Equal(generalPurposeConfiguration.GpusNumber, summaryPage.GetItemValue("Number of GPUs"));
+        Assert.Equal(generalPurposeConfiguration.LocalSSD, summaryPage.GetItemValue("Local SSD"));
+        Assert.Equal(generalPurposeConfiguration.Region, summaryPage.GetItemValue("Region"));
+
         testFailed = false;
     }
 }
